@@ -34,22 +34,20 @@ unsigned long bombDefused = 0;
 int bombActivate = 0; 
 bool hasExploded = false;
 
+int successfulDefuses = 0;
 
-void recieveMessage(int howMany){
-  while(1 < Serial.available()){
-    char c = Serial.read();
-    Serial.print(c);
+void receiveData(int byteCount) {
+  while (Wire.available()) {
+    int receivedData = Wire.read();
+    successfulDefuses += receivedData;
     digitalWrite(A1, HIGH);
   }
-  int x = Serial.read();
-  Serial.println(x);
-}
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  // Wire.begin(5);
-  // Wire.onReceive(recieveMessage);
+  Wire.begin(9);
+  Wire.onReceive(receiveData);
   //LEDS
   pinMode(A1, OUTPUT);
   pinMode(A2, OUTPUT);
@@ -75,14 +73,12 @@ void loop() {
   //   return;
   // }
 
-  if(Serial.available()){
-    char c = Serial.read();
-    Serial.print(c);
-    digitalWrite(A1, HIGH);
-  }
+  // if(Serial.available()){
+  //   char c = Serial.read();
+  //   Serial.print(c);
+  //   digitalWrite(A1, HIGH);
+  // }
 
-  //To block for now
-  return;
   currentTime = millis();
   elapsedTime = timerDuration - currentTime;
   if(timerDuration < currentTime) {
