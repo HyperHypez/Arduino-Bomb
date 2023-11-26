@@ -40,7 +40,10 @@ void loop() {
   
   if (key) {
     if (key == '#') {
-      Serial.write(dataToSend.c_str());
+      Wire.beginTransmission(9);  // Replace 9 with the address of the receiver Arduino
+      Wire.write(dataToSend.c_str());
+      Wire.endTransmission();
+      dataToSend = ""; // Clear the string variable
     } else if (key == '*') {
       dataToSend = ""; // Clear the string variable
       lcd.clear();
