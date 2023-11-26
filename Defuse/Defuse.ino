@@ -41,7 +41,8 @@ void loop() {
   if (key) {
     if (key == '#') {
       Wire.beginTransmission(9);  // Replace 9 with the address of the receiver Arduino
-      Wire.write(dataToSend.c_str());
+      // Wire.write(dataToSend.c_str());
+      Wire.write(1);
       Wire.endTransmission();
       dataToSend = ""; // Clear the string variable
     } else if (key == '*') {
