@@ -23,9 +23,10 @@ Keypad keypad = Keypad(makeKeymap(keys), pin_rows, pin_column, ROW_NUM, COLUMN_N
 String dataToSend = "";
 
 void setup() {
-  Serial.begin(9600);
   Wire.begin();
-  
+
+  pinMode(A4, INPUT_PULLUP); // Enable internal pull-up resistor for SDA
+  pinMode(A5, INPUT_PULLUP); // Enable internal pull-up resistor for SCL
   pinMode(13, OUTPUT);
 
   lcd.begin(16, 2);
@@ -40,11 +41,12 @@ void loop() {
   
   if (key) {
     if (key == '#') {
+
       Wire.beginTransmission(9);  // Replace 9 with the address of the receiver Arduino
-      // Wire.write(dataToSend.c_str());
       Wire.write(1);
-      Wire.endTransmission();
+      int result = Wire.endTransmission();
       dataToSend = ""; // Clear the string variable
+      lcd.clear();
     } else if (key == '*') {
       dataToSend = ""; // Clear the string variable
       lcd.clear();

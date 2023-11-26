@@ -40,24 +40,24 @@ void receiveData(int byteCount) {
   while (Wire.available()) {
     int receivedData = Wire.read();
     successfulDefuses += receivedData;
-    digitalWrite(A1, HIGH);
+    //digitalWrite(A2, HIGH);
   }
+}
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
   Wire.begin(9);
   Wire.onReceive(receiveData);
   //LEDS
   pinMode(A1, OUTPUT);
   pinMode(A2, OUTPUT);
 
-  //Button
-  pinMode(SCL, INPUT_PULLUP);
+  pinMode(A4, INPUT_PULLUP); // Enable internal pull-up resistor for SDA
+  pinMode(A5, INPUT_PULLUP); // Enable internal pull-up resistor for SCL
 
-  //Buzzer
-  pinMode(SDA, OUTPUT);
-  
+  pinMode(1, INPUT_PULLUP);
+  pinMode(0, OUTPUT);
+
   // Start display object
   sevseg.begin(hardwareConfig, numDigits, digitPins, segmentPins, resistorsOnSegments);
   // Set brightness
@@ -67,16 +67,10 @@ void setup() {
 
 void loop() {
   
-  // If push button is pressed, start timer, otherwise do nothing
-  // if(bombActivate == 0){
-  //   bombActivate = digitalRead(SCL);
+  //If push button is pressed, start timer, otherwise do nothing
+  // if(bombActivate == 1){
+  //   bombActivate = digitalRead(1);
   //   return;
-  // }
-
-  // if(Serial.available()){
-  //   char c = Serial.read();
-  //   Serial.print(c);
-  //   digitalWrite(A1, HIGH);
   // }
 
   currentTime = millis();
@@ -84,7 +78,7 @@ void loop() {
   if(timerDuration < currentTime) {
     sevseg.setNumber(0);
     digitalWrite(A1, HIGH);
-    tone(SDA, 1000);
+    tone(0, 1000);
 
   }else{
     sevseg.setNumber((timerDuration - currentTime)/100);
