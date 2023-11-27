@@ -1,3 +1,12 @@
+// Group 66
+// Harrison Vu, hvu28, hvu28
+// Anusha Muthekepalli, anusharm
+// Daniel Kim, dkim344, dkim344
+// Chris Szeliga, cszel3, cszel3
+// Bomb defusal game
+/* In this bomb defusal game, there exists a microcontroller “bomb” that must collectively be defused by 3 other microcontrollers that act as defusers. The mission is for a team of three players to attempt to unscramble their own scrambled word displayed on their microcontroller’s LCD screen, and if successful, the bomb will be defused. Otherwise, if the players are unsuccessful in unscrambling their words by the time the bomb timer expires, the bomb explodes and they lose the game.
+*/
+
 #include <Wire.h>
 #include <Keypad.h>
 #include <LiquidCrystal.h>
