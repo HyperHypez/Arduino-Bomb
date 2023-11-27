@@ -33,25 +33,27 @@ int buttonState;
 // Declare time variables
 unsigned long timerDuration = 20000;//120000; // bomb timer is 2 minutes
 unsigned long startTime = 0; // time when the game is started by pressing the pushbutton
-bool hasExploded = false;
+
+// Flag to indicate whether bomb is active or not
 bool bombActive = false;  // whether the bomb is active or not
 
-int successfulDefuses = 0; // number of defusers that have successfully unscrambled their word
+// Counter to check how many defusers have successfully unscrambled their word
+int successfulDefuses = 0;
 
+// Function for receiving data from defusers via I2C
 void receiveData(int byteCount) {
   while (Wire.available()) {
     int receivedData = Wire.read();
     successfulDefuses += receivedData;
-    //digitalWrite(A2, HIGH);
   }
 }
 
 void setup() {
-  // put your setup code here, to run once:
+  // Set up I2C Communication
   Wire.begin(9);
   Wire.onReceive(receiveData);
   
-  //LEDS
+  // Set up LEDS
   pinMode(rLEDPin, OUTPUT);
   pinMode(gLEDPin, OUTPUT);
 
@@ -64,53 +66,54 @@ void setup() {
   pinMode(transistorPin, OUTPUT);
   buttonState = 0;
 
-  // Start display object
+  // Start 7-segment display object
   sevseg.begin(hardwareConfig, numDigits, digitPins, segmentPins, resistorsOnSegments);
   // Set brightness
   sevseg.setBrightness(90);
-
 }
 
 void loop() {
-  /* BUTTON PRESS CODE */
-  // read the state of the pushbutton value:
+  // Read the state of the pushbutton value
   buttonState = digitalRead(buttonPin);
 
-  // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
+  // Check if the pushbutton is pressed and make sure bomb is not already active.
   if (buttonState == HIGH && !bombActive) {
-    bombActive = true;
-    startTime = millis();
+    bombActive = true; // start the bomb
+    startTime = millis(); // log when the game is started
   }
-  /* -------------------------- */
 
+  // Bomb is active and counting down
   if (bombActive) {
-    if (timerDuration + startTime < millis()) {
-      bombActive = false;
-      digitalWrite(rLEDPin, HIGH);
-      sevseg.setNumber(0);
-      startPlayback(explosion, sizeof(explosion));
-      //tone(transistorPin, 1000); // play bomb explosion on speakers
-      //tone(buzzerPin, 1000);
-      //delay(1000);
-      //noTone(transistorPin);
-      //noTone(buzzerPin);
+    if (timerDuration + startTime < millis()) { // if bomb timer runs out
+      bombActive = false; // set bomb to no longer be active
+      digitalWrite(rLEDPin, HIGH); // turn on red LED
+      sevseg.setNumber(0); // set bomb timer to statically show 0
+      startPlayback(explosion, sizeof(explosion)); // play bomb explosion on speakers
+      delay(5000); // wait for explosion sound effect to finish
+      tone(buzzerPin, 1000); // play passive buzzer tone
+      //noTone(buzzerPin); // stop passive buzzer tone
     }
-    else if (successfulDefuses == 1) {
-      bombActive = false;
-      sevseg.setNumber((timerDuration + startTime - millis()) / 100, 1);
-      digitalWrite(gLEDPin, HIGH);
-      digitalWrite(rLEDPin, LOW);
+    else if (successfulDefuses == 1) { // if all defusers successfully unscramble their words, the bomb is defused
+      bombActive = false; // set bomb to no longer be active
+      sevseg.setNumber((timerDuration + startTime - millis()) / 100, 1); // set bomb timer to stay static and stop counting down when bomb defused
+      digitalWrite(gLEDPin, HIGH); // turn on green LED
+      digitalWrite(rLEDPin, LOW); // turn off red LED if it is on
     }
-    else {
-      if ((millis()/1000) % 2 == 0) {
-        digitalWrite(rLEDPin, HIGH);
+    else { // bomb is neither exploded or defused
+      // Have red LED flash while bomb is active
+      if ((millis()/1000) % 2 == 0) { // when the seconds is divisible by 2
+        digitalWrite(rLEDPin, HIGH); // turn red LED on
       }
       else {
-        digitalWrite(rLEDPin, LOW);
+        digitalWrite(rLEDPin, LOW); // turn red LED off
       }
+
+      // Update bomb timer
       sevseg.setNumber((timerDuration + startTime - millis()) / 100, 1);
     }
   }
+
+  // Refresh bomb timer
   sevseg.refreshDisplay(); // Must run repeatedly
-  delay(2);
+  delay(2); // delay to give display smoothness
 }
