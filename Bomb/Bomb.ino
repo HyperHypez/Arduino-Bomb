@@ -31,7 +31,7 @@ const int transistorPin = 11; // transistor/speaker pin ORIGINALLY A0!!!!
 int buttonState;
 
 // Declare time variables
-unsigned long timerDuration = 20000;//120000; // bomb timer is 2 minutes
+unsigned long timerDuration = 120000; // bomb timer is 2 minutes
 unsigned long startTime = 0; // time when the game is started by pressing the pushbutton
 
 // Flag to indicate whether bomb is active or not
@@ -93,7 +93,7 @@ void loop() {
       tone(buzzerPin, 1000); // play passive buzzer tone
       //noTone(buzzerPin); // stop passive buzzer tone
     }
-    else if (successfulDefuses == 1) { // if all defusers successfully unscramble their words, the bomb is defused
+    else if (successfulDefuses == 3) { // if all defusers successfully unscramble their words, the bomb is defused
       bombActive = false; // set bomb to no longer be active
       sevseg.setNumber((timerDuration + startTime - millis()) / 100, 1); // set bomb timer to stay static and stop counting down when bomb defused
       digitalWrite(gLEDPin, HIGH); // turn on green LED
