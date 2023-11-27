@@ -6,6 +6,12 @@ const int ROW_NUM = 4; //four rows
 const int COLUMN_NUM = 4; //four columns
 String scrambledWord = "";
 
+String wordList[] = {"apple", "bacon", "child", "happy", "metal"}; //Five letter words
+String scrambledWordList[] = {"paelp", "noabc", "idclh", "payhp", "elmta"};
+String solvedScrambledWordList[] = {"27753", "22266", "24453", "42779", "63825"};
+
+int listIndex;
+
 char keys[ROW_NUM][COLUMN_NUM] = {
   {'1','2','3', 'A'},
   {'4','5','6', 'B'},
@@ -30,9 +36,12 @@ void setup() {
   pinMode(13, OUTPUT);
 
   lcd.begin(16, 2);
-  analogWrite(4, 60);
+  analogWrite(4, 40);
   lcd.setCursor(0, 0);
   lcd.print("Enter code:");
+
+  randomSeed(analogRead(0));
+  listIndex = random(5);
 }
 
 void loop() {
@@ -41,10 +50,12 @@ void loop() {
   
   if (key) {
     if (key == '#') {
-
-      Wire.beginTransmission(9);  // Replace 9 with the address of the receiver Arduino
-      Wire.write(1);
-      int result = Wire.endTransmission();
+      if(dataToSend == solvedScrambledWordList[listIndex]) {
+        Wire.beginTransmission(9);  // Replace 9 with the address of the receiver Arduino
+        Wire.write(1);
+        int result = Wire.endTransmission();
+        digitalWrite(13, HIGH);
+      }
       dataToSend = ""; // Clear the string variable
       lcd.clear();
     } else if (key == '*') {
@@ -56,7 +67,8 @@ void loop() {
   }
 
   lcd.setCursor(0, 0);
-  lcd.print("Enter the code:");
+  lcd.print("Unscramble ");
+  lcd.print(scrambledWordList[listIndex]);
 
   lcd.setCursor(0, 1);
   lcd.print(dataToSend);
